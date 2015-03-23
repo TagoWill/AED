@@ -2,178 +2,210 @@
 #include <stdlib.h>
 #include <string.h>
 
-typedef struct no *No;
-typedef struct no{
-    
+struct node
+{
     char *matricula;
     char *estado;
     int passagens;
-    int cor;
-    No pai;
-    No left;
-    No right;
+    char color;  // for color property
     
-} Nos;
+    //links for left, right children and parent
+    struct node *left, *right, *parent;
+};
 
-void LeftRotate(No *root,No x)
+
+// Left Rotation
+void LeftRotate(struct node **root,struct node *x)
 {
-    No y = x->right;
+    //y stored pointer of right child of x
+    struct node *y = NULL;
+    //if(x != NULL)
+       y = x->right;
     
-    x->right = y->left;
+    //store y's left subtree's pointer as x's right child
+    //if (x->right != NULL)
+        x->right = y->left;
     
+    //update parent pointer of x's right
     if (x->right != NULL)
-        x->right->pai = x;
+        x->right->parent = x;
     
-    y->pai = x->pai;
+    //update y's parent pointer
+    y->parent = x->parent;
     
-    if (x->pai == NULL)
+    // if x's parent is null make y as root of tree
+    if (x->parent == NULL)
         (*root) = y;
     
-    else if (x == x->pai->left)
-        x->pai->left = y;
-    else    x->pai->right = y;
+    // store y at the place of x
+    else if (x == x->parent->left)
+        x->parent->left = y;
+    else    x->parent->right = y;
     
-
+    // make x as left child of y
     y->left = x;
-    x->pai = y;
+    
+    //update parent pointer of x
+    x->parent = y;
 }
 
 
-void rightRotate(No *root,No y)
+// Right Rotation (Similar to LeftRotate)
+void rightRotate(struct node **root,struct node *y)
 {
-    No x = y->left;
-    y->left = x->right;
+    struct node *x = NULL;
+    //if(y != NULL)
+        x = y->left;
+    //if (x->right != NULL)
+        y->left = x->right;
     if (x->right != NULL)
-        x->right->pai = y;
-    x->pai =y->pai;
-    if (x->pai == NULL)
+        x->right->parent = y;
+    x->parent =y->parent;
+    if (x->parent == NULL)
         (*root) = x;
-    else if (y == y->pai->left)
-        y->pai->left = x;
-    else y->pai->right = x;
+    else if (y == y->parent->left)
+        y->parent->left = x;
+    else y->parent->right = x;
     x->right = y;
-    y->pai = x;
+    y->parent = x;
 }
 
-void insertFixUp(No *root,No z)
+// Utility function to fixup the Red-Black tree after standard BST insertion
+void insertFixUp(struct node **root,struct node *z)
 {
-    while (z != *root && z->pai->cor == 1)
+    // iterate until z is not the root and z's parent color is red
+    while (z != *root && z->parent->color == 'R')
     {
-        No y;
+        struct node *y;
         
-        if(z->pai->pai != NULL){
-            if (z->pai == z->pai->pai->left)
-                y = z->pai->pai->right;
-            else
-                y = z->pai->pai->left;
-        }else{
-            break;
+        // Find uncle and store uncle in y
+        if(z->parent->parent != NULL){
+        if (z->parent == z->parent->parent->left)
+            y = z->parent->parent->right;
+        else
+            y = z->parent->parent->left;
         }
         
-        if(y == NULL){
-            y = (No) malloc(sizeof(Nos));
-            y->cor = 0;
-        }
-        
-        if (y->cor == 1)
+        // If uncle is RED, do following
+        // (i)  Change color of parent and uncle as BLACK
+        // (ii) Change color of grandparent as RED
+        // (iii) Move z to grandparent
+        if (y != NULL && y->color == 'R')
         {
-            y->cor = 0;
-            z->pai->cor = 0;
-            z->pai->pai->cor = 1;
-            z = z->pai->pai;
-        }else{
-            if (z->pai == z->pai->pai->left &&
-                z == z->pai->left)
+            y->color = 'B';
+            z->parent->color = 'B';
+            z->parent->parent->color = 'R';
+            z = z->parent->parent;
+        }
+        
+        // Uncle is BLACK, there are four cases (LL, LR, RL and RR)
+        else
+        {
+            // Left-Left (LL) case, do following
+            // (i)  Swap color of parent and grandparent
+            // (ii) Right Rotate Grandparent
+            if(z->parent->parent != NULL){
+            if (z->parent == z->parent->parent->left &&
+                z == z->parent->left)
             {
-                int ch = z->pai->cor ;
-                z->pai->cor = z->pai->pai->cor;
-                z->pai->pai->cor = ch;
-                rightRotate(root,z->pai->pai);
-                break;
-            }
-
-            if (z->pai == z->pai->pai->left &&
-                z == z->pai->right)
-            {
-                int ch = z->cor ;
-                z->cor = z->pai->pai->cor;
-                z->pai->pai->cor = ch;
-                LeftRotate(root,z->pai);
-                rightRotate(root,z->pai->pai);
-                break;
-            }
+                char ch = z->parent->color ;
+                z->parent->color = z->parent->parent->color;
+                z->parent->parent->color = ch;
+                rightRotate(root,z->parent->parent);
+            }else
             
-
-            if (z->pai == z->pai->pai->right &&
-                z == z->pai->right)
+            // Left-Right (LR) case, do following
+            // (i)  Swap color of current node  and grandparent
+            // (ii) Left Rotate Parent
+            // (iii) Right Rotate Grand Parent
+            if (z->parent == z->parent->parent->left &&
+                z == z->parent->right)
             {
-                int ch = z->pai->cor ;
-                z->pai->cor = z->pai->pai->cor;
-                z->pai->pai->cor = ch;
-                LeftRotate(root,z->pai->pai);
-                break;
-            }
+                char ch = z->color ;
+                z->color = z->parent->parent->color;
+                z->parent->parent->color = ch;
+                LeftRotate(root,z->parent);
+                rightRotate(root,z->parent->parent);
+            }else
             
-
-            if (z->pai == z->pai->pai->right &&
-                z == z->pai->left)
+            // Right-Right (RR) case, do following
+            // (i)  Swap color of parent and grandparent
+            // (ii) Left Rotate Grandparent
+            if (z->parent == z->parent->parent->right &&
+                z == z->parent->right)
             {
-                int ch = z->cor ;
-                z->cor = z->pai->pai->cor;
-                z->pai->pai->cor = ch;
-                rightRotate(root,z->pai);
-                LeftRotate(root,z->pai->pai);
-                break;
+                char ch = z->parent->color ;
+                z->parent->color = z->parent->parent->color;
+                z->parent->parent->color = ch;
+                LeftRotate(root,z->parent->parent);
+            }else
+            
+            // Right-Left (RL) case, do following
+            // (i)  Swap color of current node  and grandparent
+            // (ii) Right Rotate Parent
+            // (iii) Left Rotate Grand Parent
+            if (z->parent == z->parent->parent->right &&
+                z == z->parent->left)
+            {
+                char ch = z->color ;
+                z->color = z->parent->parent->color;
+                z->parent->parent->color = ch;
+                rightRotate(root,z->parent);
+                LeftRotate(root,z->parent->parent);
+            }
             }
         }
     }
-    (*root)->cor = 0;
+    (*root)->color = 'B'; //keep root always black
 }
 
-void inserirNaArvore(char *m, char *e, No *root){
+// Utility function to insert newly node in RedBlack tree
+void insert(char *m, char *e, struct node **root)
+{
+    // Allocate memory for new node
+    struct node *z = (struct node*)malloc(sizeof(struct node));
+    z->matricula = malloc(sizeof(char *));
+    z->estado = malloc(sizeof(char *));
+    strcpy(z->matricula, m);
+    strcpy(z->estado, e);
+    z->passagens = 1;
+    z->left = z->right = z->parent = NULL;
     
-    No actual = (No) malloc(sizeof(Nos));
-    actual->matricula = malloc(sizeof(char *));
-    actual->estado = malloc(sizeof(char *));
-    strcpy(actual->matricula, m);
-    strcpy(actual->estado, e);
-    actual->passagens = 1;
-    actual->cor = 1;
-    actual->pai = NULL;
-    actual->left = NULL;
-    actual->right = NULL;
-    
-    if(*root == NULL){
-        (*root)=actual;
+    //if root is null make z as root
+    if (*root == NULL)
+    {
+        z->color = 'B';
+        (*root) = z;
+    }
+    else
+    {
+        struct node *y = NULL;
+        struct node *x = (*root);
         
-    }else{
-        No y = NULL;
-        No x = (*root);
-        
+        // Follow standard BST insert steps to first insert the node
         while (x != NULL)
         {
             y = x;
-            if (strcmp(actual->matricula ,x->matricula) < 0)
+            if (strcmp(z->matricula, x->matricula) < 0)
                 x = x->left;
             else
                 x = x->right;
         }
-        actual->pai= y;
-        if (strcmp(actual->matricula,  y->matricula) > 0)
-            y->right = actual;
+        z->parent = y;
+        if (strcmp(z->matricula, y->matricula) > 0)
+            y->right = z;
         else
-            y->left = actual;
-        actual->cor = 1;
+            y->left = z;
+        z->color = 'R';
         
-
-        insertFixUp(root,actual);
-        
-        
+        // call insertFixUp to fix reb-black tree's property if it
+        // is voilated due to insertion.
+        insertFixUp(root,z);
     }
-    
 }
 
-int localiza(char *m, char *e, No actual){
+
+int localiza(char *m, char *e, struct node *actual){
     
     if(actual==NULL){
         return 1;
@@ -189,7 +221,7 @@ int localiza(char *m, char *e, No actual){
     
 }
 
-void unFlag(char *m,No actual){
+void unFlag(char *m,struct node *actual){
     if(actual!=NULL){
         if(strcmp(actual->matricula, m) == 0 ){
             strcpy(actual->estado,"R");
@@ -201,7 +233,7 @@ void unFlag(char *m,No actual){
     }
 }
 
-void status(char *m,No actual){
+void status(char *m,struct node *actual){
     if(actual!=NULL){
         if(strcmp(actual->matricula, m) == 0 ){
             printf("%s %d %s\n", actual->matricula,actual->passagens,actual->estado);
@@ -216,7 +248,7 @@ void status(char *m,No actual){
 }
 
 
-void imprimirArvore(No actual){
+void imprimirArvore(struct node *actual){
     if(actual != NULL)
     {
         imprimirArvore(actual->left);
@@ -229,7 +261,7 @@ void imprimirArvore(No actual){
 
 int main() {
     
-    No arvore = NULL;
+    struct node *arvore = NULL;
     
     char *string = malloc(sizeof(5));
     char *matricula = malloc(sizeof(6));
@@ -238,13 +270,13 @@ int main() {
         if(strcmp(string, "PASS")==0){
             scanf("%s", matricula);
             scanf("%s", estadi);
-            if(localiza(matricula, estadi,arvore)){
-                inserirNaArvore(matricula, estadi, &arvore);
+            if(localiza(matricula, estadi, arvore)){
+                insert(matricula, estadi, &arvore);
             }
         }
         if(strcmp(string, "UNFLAG")==0){
             scanf("%s", matricula);
-            unFlag(matricula,arvore);
+            unFlag(matricula, arvore);
         }
         if(strcmp(string, "STATUS")==0){
             scanf("%s", matricula);
