@@ -84,7 +84,7 @@ public class ProblemaB {
 			}
 		}
 		return booleano;
-	  }
+	}
     
     public static No unflagNo(String s, No novoNo)
     {
