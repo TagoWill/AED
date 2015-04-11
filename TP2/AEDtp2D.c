@@ -186,7 +186,7 @@ int main() {
             scanf("%s", matricula);
             scanf("%s", estadi);
             if(localiza(matricula, estadi,arvore)){
-                arvore=insertNo(matricula, estadi, arvore);
+                insertNo(matricula, estadi, arvore);
             }
         }
         if(strcmp(string, "UNFLAG")==0){
