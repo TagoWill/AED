@@ -158,7 +158,7 @@ No insere(No novo, No anterior)
         }
     }
 
-void insertNo(char *m, char *e, No actual)
+No insertNo(char *m, char *e, No actual)
     {       
         No novoNo = NULL;
         novoNo = (No) malloc(sizeof(Nos));
@@ -175,6 +175,7 @@ void insertNo(char *m, char *e, No actual)
             calculaTam(actual);
         }
         actual = insere(novoNo, actual);
+        return actual;
     }
 
 int main() {
@@ -186,7 +187,7 @@ int main() {
             scanf("%s", matricula);
             scanf("%s", estadi);
             if(localiza(matricula, estadi,arvore)){
-                insertNo(matricula, estadi, arvore);
+               arvore = insertNo(matricula, estadi, arvore);
             }
         }
         if(strcmp(string, "UNFLAG")==0){
