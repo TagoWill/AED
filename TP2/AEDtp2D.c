@@ -77,10 +77,10 @@ void imprimirArvore(No actual){
 int calculaTamanho(No node)
     {
         int tamEsq=0, tamDir=0, tamanho;
-        if (node->left!=null) {
+        if (node->left!=NULL) {
             tamEsq = calculaTamanho(node->left);
         }
-        if (node->right!=null) {
+        if (node->right!=NULL) {
             tamDir = calculaTamanho(node->right);
         }
         tamanho = tamEsq + tamDir + 1;
@@ -94,7 +94,7 @@ void calculaTam(No raiz){
 
 No insereN(No node, No aux, char* t, char* e)
     {
-        if(node==null){
+        if(node==NULL){
             No novoNo = NULL;
             novoNo = (No) malloc(sizeof(Nos));
             novoNo->matricula = malloc(sizeof(char *));
@@ -117,17 +117,17 @@ No insereN(No node, No aux, char* t, char* e)
     }
 
 void insereRaiz(No novo, No node){
-        if(node!=null){
+        if(node!=NULL){
             if(strcmp(novo->matricula,node->matricula) < 0){
                 novo=insereN(novo,node,node->matricula, node->estado);
             }
             else{
                 novo=insereN(novo,node,node->matricula, node->estado);
             }
-            if(node->left!=null){
+            if(node->left!=NULL){
                 insereRaiz(novo, node->left);
             }
-            if(node->left!=null){
+            if(node->left!=NULL){
                 insereRaiz(novo, node->left);
             }
         }
@@ -135,7 +135,7 @@ void insereRaiz(No novo, No node){
 
 No insere(No novo, No anterior)
     {
-        if(anterior==null){
+        if(anterior==NULL){
             anterior=novo;
             return anterior;
         }
@@ -170,7 +170,7 @@ void insertNo(char *m, char *e, No actual)
         novoNo->left = NULL;
         novoNo->right = NULL;
 
-        if(actual!=null)
+        if(actual!=NULL)
         {
             calculaTam(actual);
         }
