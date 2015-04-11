@@ -142,7 +142,7 @@ No insere(No novo, No anterior)
         else{
             srand(time(NULL));
             int r = rand();
-            double tam=anterio-r>size;
+            double tam=anterior->size;
             double prob=(1/(tam+1));
             if(r>=prob){ 
                 insereRaiz(novo, anterior);
@@ -152,7 +152,7 @@ No insere(No novo, No anterior)
                 anterior->left=insere(novo,anterior->left);
             }
             else{
-                anterior>right=insere(novo,anterior->right);
+                anterior->right=insere(novo,anterior->right);
             }
             return anterior;
         }
