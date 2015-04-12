@@ -28,7 +28,7 @@ int localiza(char *m, char *e, No actual){
         actual->passagens=actual->passagens+1;
         strcpy(actual->estado,e);
         return 0;
-    }else if(strcmp(actual->matricula, m) > 0 ){
+    }else if(strcmp(actual->matricula, m) < 0 ){
         return localiza(m, e, actual->left);
     }else{
         return localiza(m, e, actual->right);
@@ -36,14 +36,15 @@ int localiza(char *m, char *e, No actual){
     
 }
 
-void unFlag(char *m,No actual){
+No unFlag(char *m,No actual){
     if(actual!=NULL){
         if(strcmp(actual->matricula, m) == 0 ){
             strcpy(actual->estado,"R");
-        }else if(strcmp(actual->matricula, m) > 0 ){
-            unFlag(m, actual->left);
+            return actual;
+        }else if(strcmp(actual->matricula, m) < 0 ){
+            return unFlag(m, actual->left);
         }else{
-            unFlag(m, actual->right);
+            return unFlag(m, actual->right);
         }
     }
 }
@@ -52,7 +53,7 @@ void status(char *m,No actual){
     if(actual!=NULL){
         if(strcmp(actual->matricula, m) == 0 ){
             printf("%s %d %s\n", actual->matricula,actual->passagens,actual->estado);
-        }else if(strcmp(actual->matricula, m) > 0 ){
+        }else if(strcmp(actual->matricula, m) < 0 ){
             status(m, actual->left);
         }else{
             status(m, actual->right);
@@ -192,7 +193,7 @@ int main() {
         }
         if(strcmp(string, "UNFLAG")==0){
             scanf("%s", matricula);
-            unFlag(matricula,arvore);
+            arvore = unFlag(matricula,arvore);
         }
         if(strcmp(string, "STATUS")==0){
             scanf("%s", matricula);
