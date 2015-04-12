@@ -6,14 +6,14 @@
 
 typedef struct no *No;
 typedef struct no{
-  
+    
     char *matricula;
     char *estado;
     int passagens;
     int size;
     No left;
     No right;
-
+    
 } Nos;
 
 No arvore = NULL;
@@ -47,6 +47,7 @@ No unFlag(char *m,No actual){
             return unFlag(m, actual->right);
         }
     }
+    
     return NULL;
 }
 
@@ -70,115 +71,105 @@ void imprimirArvore(No actual){
     {
         imprimirArvore(actual->left);
         printf("matricula %s Estado %s Passagens %d\n", actual->matricula,
-                                                        actual->estado,
-                                                        actual->passagens);
+               actual->estado,
+               actual->passagens);
         imprimirArvore(actual->right);
     }
 }
 
 int calculaTamanho(No node)
-    {
-        int tamEsq=0, tamDir=0, tamanho;
-        if (node->left!=NULL) {
-            tamEsq = calculaTamanho(node->left);
-        }
-        if (node->right!=NULL) {
-            tamDir = calculaTamanho(node->right);
-        }
-        tamanho = tamEsq + tamDir + 1;
-        node->size = tamanho;
-        return tamanho;
+{
+    int tamEsq=0, tamDir=0, tamanho;
+    if (node->left!=NULL) {
+        tamEsq = calculaTamanho(node->left);
     }
+    if (node->right!=NULL) {
+        tamDir = calculaTamanho(node->right);
+    }
+    tamanho = tamEsq + tamDir + 1;
+    node->size = tamanho;
+    return tamanho;
+}
 
 void calculaTam(No raiz){
-        raiz->size = calculaTamanho(raiz);
-    }
+    raiz->size = calculaTamanho(raiz);
+}
 
-No insereN(No node, No aux, char* t, char* e)
-    {
-        if(node==NULL){
-            No novoNo = NULL;
-            novoNo = (No) malloc(sizeof(Nos));
-            novoNo->matricula = malloc(sizeof(char *));
-            novoNo->estado = malloc(sizeof(char *));
-            strcpy(novoNo->matricula, t);
-            strcpy(novoNo->estado, e);
-            novoNo->passagens = 1;
-            novoNo->left = NULL;
-            novoNo->right = NULL;
-        }
-        else{
-            if(strcmp(t,node->matricula) < 0){
-                node->left=insereN(node->left, aux, t, e);
-            }
-            else{
-                node->right=insereN(node->right, aux, t, e);
-            }
-        }
+No insereN(No node, No aux)
+{
+    if(node==NULL){
+        node=aux;
         return node;
     }
-
-void insereRaiz(No novo, No node){
-        if(node!=NULL){
-            if(strcmp(novo->matricula,node->matricula) < 0){
-                novo=insereN(novo,node,node->matricula, node->estado);
-            }
-            else{
-                novo=insereN(novo,node,node->matricula, node->estado);
-            }
-            if(node->left!=NULL){
-                insereRaiz(novo, node->left);
-            }
-            if(node->left!=NULL){
-                insereRaiz(novo, node->left);
-            }
-        }
-    }
-
-No insere(No novo, No anterior)
-    {
-        if(anterior==NULL){
-            anterior=novo;
-            return anterior;
+    else{
+        if(strcmp(node->matricula, aux->matricula) < 0){
+            node->left=insereN(node->left, aux);
         }
         else{
-            srand(time(NULL));
-            int r = rand();
-            double tam=anterior->size;
-            double prob=(1/(tam+1));
-            if(r>=prob){ 
-                insereRaiz(novo, anterior);
-                return novo;
-            }
-            else if(strcmp(novo->matricula,anterior->matricula) < 0){
-                anterior->left=insere(novo,anterior->left);
-            }
-            else{
-                anterior->right=insere(novo,anterior->right);
-            }
-            return anterior;
+            node->right=insereN(node->right, aux);
         }
     }
+    return node;
+}
+
+No insereRaiz(No novo, No node){
+    if(node!=NULL){
+        if(strcmp(novo->matricula,node->matricula) < 0){
+            novo=insereN(novo,node);
+        }
+        else{
+            novo=insereN(novo,node);
+        }
+        return novo;
+    }
+    return novo;
+}
+
+No insere(No novo, No anterior)
+{
+    if(anterior==NULL){
+        anterior=novo;
+        return anterior;
+    }
+    else{
+        srand(time(NULL));
+        int r = rand() % 100 + 1;
+        double random = r/100.0;
+        double tam=anterior->size;
+        double prob=(1/(tam+1));
+        if(random>=prob){
+            novo = insereRaiz(novo, anterior);
+            return novo;
+        }
+        else if(strcmp(novo->matricula,anterior->matricula) < 0){
+            anterior->left=insere(novo,anterior->left);
+        }
+        else{
+            anterior->right=insere(novo,anterior->right);
+        }
+        return anterior;
+    }
+}
 
 No insertNo(char *m, char *e, No actual)
-    {       
-        No novoNo = NULL;
-        novoNo = (No) malloc(sizeof(Nos));
-        novoNo->matricula = malloc(sizeof(char *));
-        novoNo->estado = malloc(sizeof(char *));
-        strcpy(novoNo->matricula, m);
-        strcpy(novoNo->estado, e);
-        novoNo->passagens = 1;
-        novoNo->left = NULL;
-        novoNo->right = NULL;
-
-        if(actual!=NULL)
-        {
-            calculaTam(actual);
-        }
-        actual = insere(novoNo, actual);
-        return actual;
+{
+    No novoNo = NULL;
+    novoNo = (No) malloc(sizeof(Nos));
+    novoNo->matricula = malloc(sizeof(char *));
+    novoNo->estado = malloc(sizeof(char *));
+    strcpy(novoNo->matricula, m);
+    strcpy(novoNo->estado, e);
+    novoNo->passagens = 1;
+    novoNo->left = NULL;
+    novoNo->right = NULL;
+    
+    if(actual!=NULL)
+    {
+        calculaTam(actual);
     }
+    actual = insere(novoNo, actual);
+    return actual;
+}
 
 int main() {
     char *string = malloc(sizeof(5));
@@ -189,7 +180,7 @@ int main() {
             scanf("%s", matricula);
             scanf("%s", estadi);
             if(localiza(matricula, estadi,arvore)){
-               arvore = insertNo(matricula, estadi, arvore);
+                arvore = insertNo(matricula, estadi, arvore);
             }
         }
         if(strcmp(string, "UNFLAG")==0){
@@ -200,9 +191,8 @@ int main() {
             scanf("%s", matricula);
             status(matricula, arvore);
         }
-
+        
     }
-
     
     return 0;
 }
