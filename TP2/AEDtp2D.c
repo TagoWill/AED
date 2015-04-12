@@ -47,6 +47,7 @@ No unFlag(char *m,No actual){
             return unFlag(m, actual->right);
         }
     }
+    return NULL;
 }
 
 void status(char *m,No actual){
