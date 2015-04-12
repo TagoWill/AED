@@ -22,26 +22,21 @@ public class ProblemaD {
 				if(line.endsWith("I"))
 				{
 					line = line.replace(" I", "");
-					if(!tree.verificar(tree.getRaiz(), line, "I")){
+					if(!tree.verify(tree.getRaiz(), line, "I")){
 						tree.insertNo(tree.getRaiz(), line, "I");
 					}
 				}else {
 					line = line.replace(" R", "");
-					
-					if(!tree.verificar(tree.getRaiz(), line, "R")){
+					if(!tree.verify(tree.getRaiz(), line, "R")){
 						tree.insertNo(tree.getRaiz(), line, "R");
 					}
 				}
 			} else if(line.startsWith("UNFLAG"))
 			{
 				line = line.replace("UNFLAG ", "");
-				if(tree.locateNo(tree.getRaiz(), line) == true)
+				if(tree.locateNo(tree.getRaiz(), line))
 				{
-					try {
-						tree.unflag(line);
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
+					tree.unflagNo(line, tree.getRaiz());
 				}
 			} else if(line.startsWith("STATUS"))
 			{
@@ -148,7 +143,7 @@ class RandomTree
 		return node;
 	}
 
-	public boolean verificar(No node, String word, String e){
+	public boolean verify(No node, String word, String e){
 		if(node==null){
 			return false;
 		}
@@ -159,10 +154,10 @@ class RandomTree
 				return true;
 			}
 			else if(word.compareTo(node.matricula)<0){
-				return verificar(node.left, word, e);
+				return verify(node.left, word, e);
 			}
 			else{
-				return verificar(node.right, word, e);
+				return verify(node.right, word, e);
 			}
 		}
 	}
@@ -183,57 +178,18 @@ class RandomTree
 			}
 		}
 	}
-
-	public void unflag(String s) throws Exception
-	{
-		this.raiz = unflagNo(s, this.raiz);
-		if(this.raiz!=null){
-			calculaTam();
-		}
-	}
     
     public No unflagNo(String s, No novoNo)
     {
-    	if(novoNo==null) return null;
-		if(novoNo.matricula.compareToIgnoreCase(s) == 0)
+    	if(s.compareToIgnoreCase(novoNo.matricula) == 0)
 		{
-			No tmp;
-			tmp=escolhe(novoNo.left,novoNo.right);	
-			novoNo=tmp;
 			novoNo.estado = "R";
-		}else if(novoNo.matricula.compareToIgnoreCase(s) < 0)
+			return novoNo;
+		}else if(s.compareToIgnoreCase(novoNo.matricula) < 0)
 		{
-			novoNo.left = unflagNo(s, novoNo.left);
-		} else {
-			novoNo.right = unflagNo(s, novoNo.right);
-		}
-		return novoNo;
-	}
-	
-    public No escolhe(No esquerda, No direita){
-		double n,tamaux;
-
-		if(esquerda==null && direita!=null){
-			return direita;
-		}
-		else if(direita==null && esquerda!=null){
-			return esquerda;
-		}
-		else if(esquerda!=null && direita!=null){
-
-			n=esquerda.size+direita.size;
-			tamaux=esquerda.size;
-			if(Math.random()*n < 1.0*tamaux){
-				esquerda.right=escolhe(esquerda.right,direita);
-				return esquerda;
-			}
-			else{
-				direita.left=escolhe(esquerda,direita.left);
-				return direita;
-			}
-		}
-		else{
-			return null;
+			return unflagNo(s, novoNo.left);
+		}else {
+			return unflagNo(s, novoNo.right);
 		}
 	}
     
